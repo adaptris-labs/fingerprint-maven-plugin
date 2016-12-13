@@ -20,15 +20,13 @@ The following patterns are used to detect resources eligible for fingerprinting:
   * `"([^\\s]*?\\.js)"`
   * `<img.*?src="(.*?)".*?>`
   * `url\("(.*?)"\)`
-  * `(<c:url.*?value=\")(/{1}.*?)(\".*?>)`
+  * `<c:url.*?value=\")([/{1}|\\.{1,2}].*?)(\".*?>`
+  * `fromUrl:\\s*[\",'])(.*?)([\",']`
 
 After fingerprinting it is safe to add max expires header. 
 
 Requirements
 
-  * All resources should have absolute paths:
-    * Valid: `<img src="/img/test.png">`
-    * Invalid: `<img src="test.png">`
   * All resources should point to existing files without any pre-processing:
     * Valid: `<img src="/img/test.png">`
     * Invalid: `<img src="<c:if test="${var}">/img/test.png</c:if>"`
@@ -81,6 +79,10 @@ Configuration
 						<extensionToFilter>js</extensionToFilter>
 					</extensionsToFilter>
 <!-- cdn host. Not required. For example using "//accountname.r.worldssl.net": /css/bootstrap.css -> //accountname.r.worldssl.net/css/<md5>bootstrap.css -->
+					<!-- Need to be (group1 before url)(group2 url)(group3 after url) -->
+					<patterns>
+						<pattern>(customUrlPattern=\\s*[\",'])(.*?)([\",'])</pattern>
+					</patterns>
 					<cdn>${cdn}</cdn>
 				</configuration>
 			</plugin>

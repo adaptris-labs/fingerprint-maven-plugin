@@ -1,0 +1,6 @@
+.image-background-double-quotes {
+	backgroud: url("../images/image.png");
+}
+.image-background-single-quotes {
+	backgroud: url('../images/image.png');
+}

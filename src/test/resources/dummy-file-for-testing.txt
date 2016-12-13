@@ -1,3 +1,0 @@
-Meaningless dummy file for Junit tests.
-
-<c:url value="/favicon.ico" var="faviconUrl"/>

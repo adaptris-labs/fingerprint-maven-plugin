@@ -1,185 +1,241 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.aerse.maven</groupId>
-	<artifactId>fingerprint-maven-plugin</artifactId>
-	<version>3.5-SNAPSHOT</version>
-	<packaging>maven-plugin</packaging>
-	<name>fingerprint-plugin</name>
-	<description>Plugin for web resources optimization</description>
-	<inceptionYear>2014</inceptionYear>
-	<url>https://github.com/dernasherbrezon/fingerprint-maven-plugin</url>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.adaptris.maven</groupId>
+    <artifactId>fingerprint-maven-plugin</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>maven-plugin</packaging>
+    <name>fingerprint-maven-plugin</name>
+    <description>Maven Plugin which add resource fingerprint to the resource URL</description>
+    <inceptionYear>2016</inceptionYear>
+    <url>https://github.com/dernasherbrezon/fingerprint-maven-plugin</url>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	</properties>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <jacoco.exec.path>${project.build.directory}/coverage-reports/jacoco.exec</jacoco.exec.path>
+    </properties>
 
-	<dependencies>
-		<dependency>
-			<groupId>commons-codec</groupId>
-			<artifactId>commons-codec</artifactId>
-			<version>1.10</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>2.0.1</version>
-		</dependency>
-		<dependency>
-			<groupId>com.yahoo.platform.yui</groupId>
-			<artifactId>yuicompressor</artifactId>
-			<version>2.4.8</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.maven</groupId>
-			<artifactId>maven-plugin-api</artifactId>
-			<version>3.0.5</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.maven.plugin-tools</groupId>
-			<artifactId>maven-plugin-annotations</artifactId>
-			<version>3.2</version>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.10</version>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.10</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.5</version>
+        </dependency>
+        <dependency>
+            <groupId>com.yahoo.platform.yui</groupId>
+            <artifactId>yuicompressor</artifactId>
+            <version>2.4.8</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-plugin-api</artifactId>
+            <version>3.0.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.plugin-tools</groupId>
+            <artifactId>maven-plugin-annotations</artifactId>
+            <version>3.2</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
-	<build>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.3</version>
+                <configuration>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <useReleaseProfile>false</useReleaseProfile>
+                    <releaseProfiles>release</releaseProfiles>
+                    <goals>deploy</goals>
+                </configuration>
+            </plugin>        
+<!--             <plugin> -->
+<!--                 <groupId>org.apache.maven.plugins</groupId> -->
+<!--                 <artifactId>maven-gpg-plugin</artifactId> -->
+<!--                 <version>1.6</version> -->
+<!--                 <executions> -->
+<!--                     <execution> -->
+<!--                         <id>sign-artifacts</id> -->
+<!--                         <phase>verify</phase> -->
+<!--                         <goals> -->
+<!--                             <goal>sign</goal> -->
+<!--                         </goals> -->
+<!--                        </execution> -->
+<!--                 </executions> -->
+<!--             </plugin>         -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.0.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>        
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-install-plugin</artifactId>
+                <version>2.5.2</version>
+                <configuration>
+                    <createChecksum>true</createChecksum>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-plugin-plugin</artifactId>
+                <version>3.2</version>
+                <configuration>
+                    <goalPrefix>fingerprint</goalPrefix>
+                    <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
+                    <extractors>
+                        <!-- We only need the java extractor and not the bsh one -->
+                        <extractor>java-annotations</extractor>
+                    </extractors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>mojo-descriptor</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>descriptor</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.2</version>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.7</version>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.19.1</version>
+				<configuration>
+					<!-- Sets the VM argument line used when unit tests are run -->
+					<argLine>${surefireArgLine}</argLine>
+					<redirectTestOutputToFile>true</redirectTestOutputToFile>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.7.7.201606060606</version>
+				<executions>
+					<execution>
+						<id>pre-unit-test</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+						<configuration>
+							<!-- Sets the path to the file which contains the execution data. -->
+							<destFile>${jacoco.exec.path}</destFile>
+							<!-- Sets the name of the property containing the settings for JaCoCo runtime agent. -->
+							<propertyName>surefireArgLine</propertyName>
+						</configuration>
+					</execution>
+					<execution>
+						<id>post-unit-test</id>
+						<phase>test</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+						<configuration>
+							<!-- Sets the path to the file which contains the execution data. -->
+							<dataFile>${jacoco.exec.path}</dataFile>
+							<!-- Sets the output directory for the code coverage report. -->
+							<outputDirectory>${project.reporting.outputDirectory}/jacoco</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+        </plugins>
+    </build>
+
+    <reporting>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-release-plugin</artifactId>
-				<version>2.5.1</version>
+				<artifactId>maven-surefire-report-plugin</artifactId>
+				<version>2.19.1</version>
 				<configuration>
-					<autoVersionSubmodules>true</autoVersionSubmodules>
-					<useReleaseProfile>false</useReleaseProfile>
-					<releaseProfiles>release</releaseProfiles>
-					<goals>deploy</goals>
-				</configuration>
-			</plugin>		
-			<plugin>
-				<groupId>org.sonatype.plugins</groupId>
-				<artifactId>nexus-staging-maven-plugin</artifactId>
-				<version>1.6.6</version>
-				<extensions>true</extensions>
-				<configuration>
-					<serverId>ossrh</serverId>
-					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
-					<autoReleaseAfterClose>true</autoReleaseAfterClose>
-				</configuration>
-			</plugin>		
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-gpg-plugin</artifactId>
-				<version>1.5</version>
-				<executions>
-					<execution>
-						<id>sign-artifacts</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>sign</goal>
-						</goals>
-   					</execution>
-				</executions>
-			</plugin>		
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<version>2.2</version>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>		
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-install-plugin</artifactId>
-				<version>2.4</version>
-				<configuration>
-					<createChecksum>true</createChecksum>
+					<goal>report-only</goal>
 				</configuration>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-plugin-plugin</artifactId>
-				<version>3.2</version>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.7.7.201606060606</version>
 				<configuration>
-					<goalPrefix>fingerprint</goalPrefix>
-					<skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
-					<extractors>
-						<!-- We only need the java extractor and not the bsh one -->
-						<extractor>java-annotations</extractor>
-					</extractors>
-				</configuration>
-				<executions>
-					<execution>
-						<id>mojo-descriptor</id>
-						<phase>process-classes</phase>
-						<goals>
-							<goal>descriptor</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.1</version>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>2.6</version>
-				<configuration>
-					<encoding>UTF-8</encoding>
+					<!-- Sets the path to the file which contains the execution data. -->
+					<destFile>${jacoco.exec.path}</destFile>
+					<dataFile>${jacoco.exec.path}</dataFile>
+					<!-- Sets the name of the property containing the settings for JaCoCo runtime agent. -->
+					<propertyName>surefireArgLine</propertyName>
 				</configuration>
 			</plugin>
 		</plugins>
-	</build>
-	
-	<licenses>
-		<license>
-			<name>The Apache Software License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-		</license>
-	</licenses>
+    </reporting>
 
-	<developers>
-		<developer>
-			<id>DErNasherBrezon</id>
-			<name>DErNasherBrezon</name>
-			<email>dernasherbrezon@gmail.com</email>
-		</developer>
-	</developers>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
 
-	<scm>
-		<url>https://github.com/dernasherbrezon/fingerprint-maven-plugin</url>
-		<connection>scm:git:git@github.com/dernasherbrezon/fingerprint-maven-plugin.git</connection>
-		<developerConnection>scm:git:https://github.com/dernasherbrezon/fingerprint-maven-plugin.git</developerConnection>
-      <tag>HEAD</tag>
-  </scm>
-	
-	<issueManagement>
-		<system>GitHub Issues</system>
-		<url>https://github.com/dernasherbrezon/fingerprint-maven-plugin/issues</url>
-	</issueManagement>
-	
-	<distributionManagement>
-		<snapshotRepository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-	</distributionManagement>
-	
+    <developers>
+        <developer>
+            <id>sebastien-belin-adp</id>
+            <name>sebastien-belin-adp</name>
+        </developer>
+    </developers>
+
+<!--     <scm> -->
+<!--         <url>https://github.com/dernasherbrezon/fingerprint-maven-plugin</url> -->
+<!--         <connection>scm:git:git@github.com/dernasherbrezon/fingerprint-maven-plugin.git</connection> -->
+<!--         <developerConnection>scm:git:https://github.com/dernasherbrezon/fingerprint-maven-plugin.git</developerConnection> -->
+<!--         <tag>HEAD</tag> -->
+<!--     </scm> -->
+    
+<!--     <issueManagement> -->
+<!--         <system>GitHub Issues</system> -->
+<!--         <url>https://github.com/dernasherbrezon/fingerprint-maven-plugin/issues</url> -->
+<!--     </issueManagement> -->
+    
+<!--     <distributionManagement> -->
+<!--         <snapshotRepository> -->
+<!--             <id>ossrh</id> -->
+<!--             <url>https://oss.sonatype.org/content/repositories/snapshots</url> -->
+<!--         </snapshotRepository> -->
+<!--     </distributionManagement> -->
+    
 </project>

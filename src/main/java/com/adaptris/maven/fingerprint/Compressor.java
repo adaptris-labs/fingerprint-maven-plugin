@@ -1,4 +1,4 @@
-package com.st.maven.fingerprint;
+package com.adaptris.maven.fingerprint;
 
 import java.io.IOException;
 import java.io.Reader;
