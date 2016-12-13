@@ -1,9 +1,8 @@
-/target
-.idea
+# ignore project files
 .classpath
 .project
+.idea
 .settings
-/maven-fingerprint-plugin/fingerprint-plugin.iml
-
-# We don't want to keep cruft from JUnit test runs in version control
-/maven-fingerprint-plugin/src/test/fingered-web
+*.class
+*~
+/target
