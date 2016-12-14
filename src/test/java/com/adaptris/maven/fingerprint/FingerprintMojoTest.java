@@ -203,7 +203,7 @@ public class FingerprintMojoTest {
     assertTrue("file " + dummyFileForTesting.getAbsolutePath() + " should exist", dummyFileForTesting.exists());
     String fileContent = Utils.readFile(dummyFileForTesting);
     assertTrue(fileContent.contains("value=\"/favicon.ico?ff9e2a0dfb06836b6c079afd75f81369\""));
-    assertTrue(fileContent.contains("href=\"css/style.css?8dcfc23d6a370ca167a39ebe905cc423\""));
+    assertTrue(fileContent, fileContent.contains("href=\"css/style.css?8dcfc23d6a370ca167a39ebe905cc423\""));
     assertTrue(fileContent.contains("href=\"css/style.css?8dcfc23d6a370ca167a39ebe905cc423&param=value\""));
     assertTrue(fileContent.contains("href=\"css/style.css?8dcfc23d6a370ca167a39ebe905cc423#tag\""));
     assertTrue(fileContent.contains("src=\"/js/script.js?9994db6574d19a157f9b152ad8327ffd\""));
