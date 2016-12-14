@@ -200,7 +200,7 @@ public class FingerprintMojoTest {
 
   private void assertRootDummyFile(File outputDirectory) throws MojoExecutionException {
     File dummyFileForTesting = new File(outputDirectory, "dummy-file-for-testing.html");
-    assertTrue(dummyFileForTesting.exists());
+    assertTrue("file " + dummyFileForTesting.getAbsolutePath() + " should exist", dummyFileForTesting.exists());
     String fileContent = Utils.readFile(dummyFileForTesting);
     assertTrue(fileContent.contains("value=\"/favicon.ico?ff9e2a0dfb06836b6c079afd75f81369\""));
     assertTrue(fileContent.contains("href=\"css/style.css?8dcfc23d6a370ca167a39ebe905cc423\""));
