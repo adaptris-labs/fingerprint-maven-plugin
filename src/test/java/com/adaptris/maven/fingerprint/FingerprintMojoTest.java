@@ -23,7 +23,7 @@ import org.junit.Test;
  */
 public class FingerprintMojoTest {
   private static final String INPUT_DIR = "target/test-classes/to-parse";
-  private static final String OUTPUT_DIR = "target/test-classes/fingered-web";
+  private static final String OUTPUT_DIR = "target/test-classes/fingerprinted";
 
   private FingerprintMojo fingerprintMojo;
 
@@ -34,13 +34,19 @@ public class FingerprintMojoTest {
     // Configure the instance
     Class<FingerprintMojo> clazz = FingerprintMojo.class;
 
-    List<String> extensionsToFilter = new ArrayList<>();
-    extensionsToFilter.add("html");
-    extensionsToFilter.add("css");
-    extensionsToFilter.add("js");
-    Field extensionsToFilterField = clazz.getDeclaredField("extensionsToFilter");
-    extensionsToFilterField.setAccessible(true);
-    extensionsToFilterField.set(fingerprintMojo, extensionsToFilter);
+    List<String> includes = new ArrayList<>();
+    includes.add("**/*.html");
+    includes.add("**/*.css");
+    includes.add("**/*.js");
+    Field includesField = clazz.getDeclaredField("includes");
+    includesField.setAccessible(true);
+    includesField.set(fingerprintMojo, includes);
+
+    List<String> excludes = new ArrayList<>();
+    excludes.add("ignore/**");
+    Field excludesField = clazz.getDeclaredField("excludes");
+    excludesField.setAccessible(true);
+    excludesField.set(fingerprintMojo, excludes);
 
     List<String> excludeResources = new ArrayList<>();
     excludeResources.add("/js/libs");
@@ -187,6 +193,7 @@ public class FingerprintMojoTest {
     assertTrue(outputDirectory.exists());
     assertRootDummyFile(outputDirectory);
     assertSubDummyFile(outputDirectory);
+    assertIgnoreDummyFile(outputDirectory);
     assertCssUrl(outputDirectory);
     assertJsUrl(outputDirectory);
   }
@@ -213,6 +220,24 @@ public class FingerprintMojoTest {
     assertTrue(fileContent.contains("href=\"../css/style.css?8dcfc23d6a370ca167a39ebe905cc423#tag\""));
     assertTrue(fileContent.contains("src=\"../js/script.js?9994db6574d19a157f9b152ad8327ffd\""));
     assertTrue(fileContent.contains("src=\"../images/image.png?41d66b649fa61c971a70f53786d873f4\""));
+  }
+
+  private void assertIgnoreDummyFile(File outputDirectory) throws MojoExecutionException {
+    File dummyFileForTesting = new File(outputDirectory, "ignore/dummy-file-for-testing.html");
+    assertTrue(dummyFileForTesting.exists());
+    String fileContent = Utils.readFile(dummyFileForTesting);
+    assertTrue(fileContent.contains("value=\"../favicon2.ico\""));
+    assertFalse(fileContent.contains("value=\"../favicon2.ico?ff9e2a0dfb06836b6c079afd75f81369\""));
+    assertTrue(fileContent.contains("href=\"../css/style.css\""));
+    assertFalse(fileContent.contains("href=\"../css/style.css?8dcfc23d6a370ca167a39ebe905cc423\""));
+    assertTrue(fileContent.contains("href=\"../css/style.css?param=value\""));
+    assertFalse(fileContent.contains("href=\"../css/style.css?8dcfc23d6a370ca167a39ebe905cc423&param=value\""));
+    assertTrue(fileContent.contains("href=\"../css/style.css#tag\""));
+    assertFalse(fileContent.contains("href=\"../css/style.css?8dcfc23d6a370ca167a39ebe905cc423#tag\""));
+    assertTrue(fileContent.contains("src=\"../js/script.js\""));
+    assertFalse(fileContent.contains("src=\"../js/script.js?9994db6574d19a157f9b152ad8327ffd\""));
+    assertTrue(fileContent.contains("src=\"../images/image.png\""));
+    assertFalse(fileContent.contains("src=\"../images/image.png?41d66b649fa61c971a70f53786d873f4\""));
   }
 
   private void assertCssUrl(File outputDirectory) throws MojoExecutionException {

@@ -71,13 +71,16 @@ Configuration
 						<htmlExtension>jsp</htmlExtension>
 						<htmlExtension>tag</htmlExtension>
 					</htmlExtensions>
-					<extensionsToFilter>
-						<extensionToFilter>html</extensionToFilter>
-						<extensionToFilter>jsp</extensionToFilter>
-						<extensionToFilter>tag</extensionToFilter>
-						<extensionToFilter>css</extensionToFilter>
-						<extensionToFilter>js</extensionToFilter>
-					</extensionsToFilter>
+					<includes>
+						<include>**/*.html</include>
+						<include>**/*.jsp</include>
+						<include>**/*.tag</include>
+						<include>**/*.css</include>
+						<include>**/*.js</include>
+					</includes>
+					<excludes>
+						<exclude>toIgnore/**</exclude>
+					</excludes>
 <!-- cdn host. Not required. For example using "//accountname.r.worldssl.net": /css/bootstrap.css -> //accountname.r.worldssl.net/css/<md5>bootstrap.css -->
 					<!-- Need to be (group1 before url)(group2 url)(group3 after url) -->
 					<patterns>

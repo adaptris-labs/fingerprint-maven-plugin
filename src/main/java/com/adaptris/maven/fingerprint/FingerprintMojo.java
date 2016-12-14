@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -20,6 +21,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.codehaus.plexus.util.DirectoryScanner;
 
 @Mojo(name = "generate", defaultPhase = LifecyclePhase.PACKAGE)
 public class FingerprintMojo extends AbstractMojo {
@@ -60,13 +62,10 @@ public class FingerprintMojo extends AbstractMojo {
   private List<String> excludeResources;
 
   @Parameter
-  private List<String> extensionsToFilter;
+  private List<String> includes;
 
   @Parameter
-  private List<String> includeToFilters;
-
-  @Parameter
-  private List<String> excludeToFilters;
+  private List<String> excludes;
 
   @Parameter
   private Set<String> htmlExtensions;
@@ -119,14 +118,14 @@ public class FingerprintMojo extends AbstractMojo {
     if (!targetDirectory.isDirectory()) {
       throw new MojoExecutionException("output directory is not a directory: " + targetDirectory.getAbsolutePath());
     }
-    if (extensionsToFilter == null || extensionsToFilter.isEmpty()) {
-      getLog().info("no files to optimize found");
+    if (includes == null || includes.isEmpty()) {
+      getLog().info("no files to include found");
       return;
     }
-//    if (includeToFilters == null || includeToFilters.isEmpty()) {
-//      getLog().info("no files to optimize found");
-//      return;
-//    }
+    if (excludes == null || excludes.isEmpty()) {
+      getLog().info("no files to exclude found");
+      excludes = Collections.emptyList();
+    }
     List<File> filesToOptimize = new ArrayList<>();
     findFilesToOptimize(filesToOptimize, sourceDirectory);
     if (filesToOptimize.isEmpty()) {
@@ -147,27 +146,6 @@ public class FingerprintMojo extends AbstractMojo {
     }
 
     copyDeepFiles(sourceDirectory, targetDirectory);
-
-    // for (Entry<String, FilePathAndNewName> cur : sourceToFingerprintedTarget.entrySet()) {
-    // String stripSourceDirectory;
-    // stripSourceDirectory = stripSourceDirectory(sourceDirectory, new
-    // File(cur.getValue().getFilePath()));
-    // File toMove = new File(targetDirectory, stripSourceDirectory);
-    // File dest = new File(targetDirectory, cur.getValue().getNewName());
-    // // try {
-    // // FileUtils.copyFile(toMove, dest);
-    // // // FileUtils.forceDelete(toMove);
-    // // // Files.move(toMove.toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
-    // // } catch (IOException ioe) {
-    // // throw new MojoExecutionException("unable to move src: " + toMove.getAbsolutePath() + "
-    // dst:
-    // // " + dest.getAbsolutePath(), ioe);
-    // // }
-    // // if (toMove.exists() && !toMove.renameTo(dest)) {
-    // // throw new MojoExecutionException("unable to move src: " + toMove.getAbsolutePath() + "
-    // dst: " + dest.getAbsolutePath());
-    // // }
-    // }
   }
 
   private void process(File sourceFile) throws MojoExecutionException {
@@ -247,10 +225,8 @@ public class FingerprintMojo extends AbstractMojo {
           m.appendReplacement(outputFileData, "$1" + curLink + "$3");
           continue;
         }
-        // logIfRelativePath(curLink);
         String fingerprint = Utils.generateMd5Fingerprint(curLinkFile);
         targetPath = generateTargetResourceFilename(curLink, fingerprint);
-        // logIfRelativePath(targetPath);
 
         try {
           filePathAndNewName = new FilePathAndNewName(curLinkFile.getCanonicalPath(),
@@ -280,12 +256,6 @@ public class FingerprintMojo extends AbstractMojo {
     m.appendTail(outputFileData);
     return outputFileData;
   }
-
-  // private void logIfRelativePath(String path) {
-  // if (path.length() != 0 && path.charAt(0) != '/') {
-  // getLog().warn("relative path detected: " + path);
-  // }
-  // }
 
   private boolean isExcluded(String path) {
     if (excludeResources != null) {
@@ -340,50 +310,19 @@ public class FingerprintMojo extends AbstractMojo {
     if (!source.isDirectory()) {
       return;
     }
-    File[] subFiles = source.listFiles();
-    for (File curFile : subFiles) {
-      if (curFile.isDirectory()) {
-        findFilesToOptimize(output, curFile);
-        continue;
-      }
 
-      if (!curFile.isFile()) {
-        continue;
-      }
+    DirectoryScanner scanner = new DirectoryScanner();
 
-      String extension = Utils.getFileExtension(curFile.getName());
-      if (extension == null) {
-        continue;
-      }
+    scanner.setIncludes(includes.toArray(new String[includes.size()]));
+    scanner.setExcludes(excludes.toArray(new String[excludes.size()]));
+    scanner.addDefaultExcludes();
+    scanner.setBasedir(source);
+    scanner.scan();
 
-      if (extensionsToFilter.contains(extension)) {
-        output.add(curFile);
-        continue;
-      }
-//      if (matchIncludeToFilter(curFile.getName()) && !matchExcludeToFilter(curFile.getName())) {
-//        output.add(curFile);
-//        continue;
-//      }
+    for (String includedFilename : scanner.getIncludedFiles()) {
+      File curFile = new File(source, includedFilename);
+      output.add(curFile);
     }
-  }
-
-  private boolean matchIncludeToFilter(String link) {
-    return match(link, includeToFilters);
-  }
-
-  private boolean matchExcludeToFilter(String link) {
-    return match(link, excludeToFilters);
-  }
-
-  private boolean match(String link, List<String> filters) {
-    if (link != null) {
-      for (String filter : filters) {
-        if (link.matches(filter)) {
-          return true;
-        }
-      }
-    }
-    return false;
   }
 
   public class FilePathAndNewName {

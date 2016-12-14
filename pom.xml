@@ -12,7 +12,13 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jacoco.exec.path>${project.build.directory}/coverage-reports/jacoco.exec</jacoco.exec.path>
+        <snapshot.repo.url>https://development.adaptris.net/nexus/content/repositories/snapshots</snapshot.repo.url>
+        <release.repo.url>https://development.adaptris.net/nexus/content/repositories/releases</release.repo.url>
     </properties>
+
+    <prerequisites>
+        <maven>3.1.0</maven>
+    </prerequisites>
 
     <dependencies>
         <dependency>
@@ -129,80 +135,89 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-eclipse-plugin</artifactId>
+                <version>2.9</version>
+                <configuration>
+                    <downloadSources>true</downloadSources>
+                    <downloadJavadocs>true</downloadJavadocs>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>2.7</version>
                 <configuration>
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.19.1</version>
-				<configuration>
-					<!-- Sets the VM argument line used when unit tests are run -->
-					<argLine>${surefireArgLine}</argLine>
-					<redirectTestOutputToFile>true</redirectTestOutputToFile>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.7.7.201606060606</version>
-				<executions>
-					<execution>
-						<id>pre-unit-test</id>
-						<goals>
-							<goal>prepare-agent</goal>
-						</goals>
-						<configuration>
-							<!-- Sets the path to the file which contains the execution data. -->
-							<destFile>${jacoco.exec.path}</destFile>
-							<!-- Sets the name of the property containing the settings for JaCoCo runtime agent. -->
-							<propertyName>surefireArgLine</propertyName>
-						</configuration>
-					</execution>
-					<execution>
-						<id>post-unit-test</id>
-						<phase>test</phase>
-						<goals>
-							<goal>report</goal>
-						</goals>
-						<configuration>
-							<!-- Sets the path to the file which contains the execution data. -->
-							<dataFile>${jacoco.exec.path}</dataFile>
-							<!-- Sets the output directory for the code coverage report. -->
-							<outputDirectory>${project.reporting.outputDirectory}/jacoco</outputDirectory>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.19.1</version>
+                <configuration>
+                    <!-- Sets the VM argument line used when unit tests are run -->
+                    <argLine>${surefireArgLine}</argLine>
+                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.7.7.201606060606</version>
+                <executions>
+                    <execution>
+                        <id>pre-unit-test</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Sets the path to the file which contains the execution data. -->
+                            <destFile>${jacoco.exec.path}</destFile>
+                            <!-- Sets the name of the property containing the settings for JaCoCo runtime agent. -->
+                            <propertyName>surefireArgLine</propertyName>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>post-unit-test</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Sets the path to the file which contains the execution data. -->
+                            <dataFile>${jacoco.exec.path}</dataFile>
+                            <!-- Sets the output directory for the code coverage report. -->
+                            <outputDirectory>${project.reporting.outputDirectory}/jacoco</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
     <reporting>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-report-plugin</artifactId>
-				<version>2.19.1</version>
-				<configuration>
-					<goal>report-only</goal>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.7.7.201606060606</version>
-				<configuration>
-					<!-- Sets the path to the file which contains the execution data. -->
-					<destFile>${jacoco.exec.path}</destFile>
-					<dataFile>${jacoco.exec.path}</dataFile>
-					<!-- Sets the name of the property containing the settings for JaCoCo runtime agent. -->
-					<propertyName>surefireArgLine</propertyName>
-				</configuration>
-			</plugin>
-		</plugins>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+                <version>2.19.1</version>
+                <configuration>
+                    <goal>report-only</goal>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.7.7.201606060606</version>
+                <configuration>
+                    <!-- Sets the path to the file which contains the execution data. -->
+                    <destFile>${jacoco.exec.path}</destFile>
+                    <dataFile>${jacoco.exec.path}</dataFile>
+                    <!-- Sets the name of the property containing the settings for JaCoCo runtime agent. -->
+                    <propertyName>surefireArgLine</propertyName>
+                </configuration>
+            </plugin>
+        </plugins>
     </reporting>
 
     <licenses>
@@ -219,23 +234,19 @@
         </developer>
     </developers>
 
-<!--     <scm> -->
-<!--         <url>https://github.com/dernasherbrezon/fingerprint-maven-plugin</url> -->
-<!--         <connection>scm:git:git@github.com/dernasherbrezon/fingerprint-maven-plugin.git</connection> -->
-<!--         <developerConnection>scm:git:https://github.com/dernasherbrezon/fingerprint-maven-plugin.git</developerConnection> -->
-<!--         <tag>HEAD</tag> -->
-<!--     </scm> -->
-    
-<!--     <issueManagement> -->
-<!--         <system>GitHub Issues</system> -->
-<!--         <url>https://github.com/dernasherbrezon/fingerprint-maven-plugin/issues</url> -->
-<!--     </issueManagement> -->
-    
-<!--     <distributionManagement> -->
-<!--         <snapshotRepository> -->
-<!--             <id>ossrh</id> -->
-<!--             <url>https://oss.sonatype.org/content/repositories/snapshots</url> -->
-<!--         </snapshotRepository> -->
-<!--     </distributionManagement> -->
+    <distributionManagement>
+        <repository>
+            <id>adaptris-releases</id>
+            <url>${release.repo.url}</url>
+            <layout>default</layout>
+            <uniqueVersion>false</uniqueVersion>
+        </repository>
+        <snapshotRepository>
+            <id>adaptris-snapshots</id>
+            <url>${snapshot.repo.url}</url>
+            <layout>default</layout>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
+    </distributionManagement>
     
 </project>
