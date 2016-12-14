@@ -16,7 +16,9 @@ import java.util.regex.Pattern;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  * @author Richard Scott Smith <scott.smith@isostech.com>
@@ -24,6 +26,9 @@ import org.junit.Test;
 public class FingerprintMojoTest {
   private static final String INPUT_DIR = "target/test-classes/to-parse";
   private static final String OUTPUT_DIR = "target/test-classes/fingerprinted";
+
+  @Rule
+  public ExpectedException thrown = ExpectedException.none();
 
   private FingerprintMojo fingerprintMojo;
 
@@ -34,13 +39,7 @@ public class FingerprintMojoTest {
     // Configure the instance
     Class<FingerprintMojo> clazz = FingerprintMojo.class;
 
-    List<String> includes = new ArrayList<>();
-    includes.add("**/*.html");
-    includes.add("**/*.css");
-    includes.add("**/*.js");
-    Field includesField = clazz.getDeclaredField("includes");
-    includesField.setAccessible(true);
-    includesField.set(fingerprintMojo, includes);
+    configureInclude(fingerprintMojo, clazz);
 
     List<String> excludes = new ArrayList<>();
     excludes.add("ignore/**");
@@ -49,7 +48,7 @@ public class FingerprintMojoTest {
     excludesField.set(fingerprintMojo, excludes);
 
     List<String> excludeResources = new ArrayList<>();
-    excludeResources.add("/js/libs");
+    excludeResources.add("//");
     Field excludeResourcesField = clazz.getDeclaredField("excludeResources");
     excludeResourcesField.setAccessible(true);
     excludeResourcesField.set(fingerprintMojo, excludeResources);
@@ -60,16 +59,36 @@ public class FingerprintMojoTest {
     patternsField.setAccessible(true);
     patternsField.set(fingerprintMojo, patterns);
 
-    // File sourceDirectory = new File("target/test-classes/to-parse");
+    configureSourceDir(fingerprintMojo, clazz);
+    configureTargetDir(fingerprintMojo, clazz, OUTPUT_DIR);
+  }
+
+  private void configureSourceDir(FingerprintMojo fingerprintMojo, Class<FingerprintMojo> clazz)
+      throws NoSuchFieldException, IllegalAccessException {
     File sourceDirectory = new File(INPUT_DIR);
     Field sourceDirectoryField = clazz.getDeclaredField("sourceDirectory");
     sourceDirectoryField.setAccessible(true);
     sourceDirectoryField.set(fingerprintMojo, sourceDirectory);
+  }
 
-    File outputDirectory = new File(OUTPUT_DIR);
-    Field outputDirectoryField = clazz.getDeclaredField("targetDirectory");
-    outputDirectoryField.setAccessible(true);
-    outputDirectoryField.set(fingerprintMojo, outputDirectory);
+  private void configureTargetDir(FingerprintMojo fingerprintMojo, Class<FingerprintMojo> clazz,
+      String outputDir)
+          throws NoSuchFieldException, IllegalAccessException {
+    File targetDirectory = new File(outputDir);
+    Field taretDirectoryField = clazz.getDeclaredField("targetDirectory");
+    taretDirectoryField.setAccessible(true);
+    taretDirectoryField.set(fingerprintMojo, targetDirectory);
+  }
+
+  private void configureInclude(FingerprintMojo fingerprintMojo, Class<FingerprintMojo> clazz)
+      throws NoSuchFieldException, IllegalAccessException {
+    List<String> includes = new ArrayList<>();
+    includes.add("**/*.html");
+    includes.add("**/*.css");
+    includes.add("**/*.js");
+    Field includesField = clazz.getDeclaredField("includes");
+    includesField.setAccessible(true);
+    includesField.set(fingerprintMojo, includes);
   }
 
   /**
@@ -185,6 +204,106 @@ public class FingerprintMojoTest {
   }
 
   @Test
+  public void testAddBadPattern() throws Exception {
+    thrown.expect(MojoExecutionException.class);
+    thrown.expectMessage("unable to add custom patter");
+
+
+    FingerprintMojo fingerprintMojo = new FingerprintMojo();
+
+    // Configure the instance
+    Class<FingerprintMojo> clazz = FingerprintMojo.class;
+
+    Set<String> patterns = new HashSet<>();
+    patterns.add("/a)(*");
+    Field patternsField = clazz.getDeclaredField("patterns");
+    patternsField.setAccessible(true);
+    patternsField.set(fingerprintMojo, patterns);
+
+    fingerprintMojo.execute();
+  }
+
+  @Test
+  public void testSourceDirectoryNotDir() throws Exception {
+    thrown.expect(MojoExecutionException.class);
+    thrown.expectMessage("source directory is not a directory");
+
+
+    FingerprintMojo fingerprintMojo = new FingerprintMojo();
+
+    // Configure the instance
+    Class<FingerprintMojo> clazz = FingerprintMojo.class;
+
+    File sourceDirectory = new File(INPUT_DIR + File.separator + "dummy-file-for-testing.html");
+    Field sourceDirectoryField = clazz.getDeclaredField("sourceDirectory");
+    sourceDirectoryField.setAccessible(true);
+    sourceDirectoryField.set(fingerprintMojo, sourceDirectory);
+
+    fingerprintMojo.execute();
+  }
+
+  @Test
+  public void testTargetDirectoryNotDir() throws Exception {
+    thrown.expect(MojoExecutionException.class);
+    thrown.expectMessage("output directory is not a directory");
+
+    FingerprintMojo fingerprintMojo = new FingerprintMojo();
+
+    // Configure the instance
+    Class<FingerprintMojo> clazz = FingerprintMojo.class;
+
+    configureSourceDir(fingerprintMojo, clazz);
+
+    File targetDirectory = new File(OUTPUT_DIR + File.separator + "dummy-file-for-testing.html");
+    targetDirectory.getParentFile().mkdirs();
+    targetDirectory.createNewFile();
+    Field targetDirectoryField = clazz.getDeclaredField("targetDirectory");
+    targetDirectoryField.setAccessible(true);
+    targetDirectoryField.set(fingerprintMojo, targetDirectory);
+
+    fingerprintMojo.execute();
+  }
+
+  @Test
+  public void testNoInclude() throws Exception {
+    File outputDirectory = new File(OUTPUT_DIR + "_testNoInclude");
+    FingerprintMojo fingerprintMojo = new FingerprintMojo();
+
+    // Configure the instance
+    Class<FingerprintMojo> clazz = FingerprintMojo.class;
+
+    configureSourceDir(fingerprintMojo, clazz);
+    configureTargetDir(fingerprintMojo, clazz, outputDirectory.getAbsolutePath());
+
+    FileUtils.deleteDirectory(outputDirectory);
+
+    fingerprintMojo.execute();
+
+    File dummyFileForTesting = new File(outputDirectory, "dummy-file-for-testing.html");
+    assertFalse("file " + dummyFileForTesting.getAbsolutePath() + " should not exist", dummyFileForTesting.exists());
+  }
+
+  @Test
+  public void testNoExclude() throws Exception {
+    File outputDirectory = new File(OUTPUT_DIR + "_testNoExclude");
+    FingerprintMojo fingerprintMojo = new FingerprintMojo();
+
+    // Configure the instance
+    Class<FingerprintMojo> clazz = FingerprintMojo.class;
+
+    configureSourceDir(fingerprintMojo, clazz);
+    configureTargetDir(fingerprintMojo, clazz, outputDirectory.getAbsolutePath());
+    configureInclude(fingerprintMojo, clazz);
+
+    FileUtils.deleteDirectory(outputDirectory);
+
+    fingerprintMojo.execute();
+
+    File dummyFileForTesting = new File(outputDirectory, "dummy-file-for-testing.html");
+    assertTrue("file " + dummyFileForTesting.getAbsolutePath() + " should exist", dummyFileForTesting.exists());
+  }
+
+  @Test
   public void testExecute() throws Exception {
     File outputDirectory = new File(OUTPUT_DIR);
     FileUtils.deleteDirectory(outputDirectory);
@@ -206,6 +325,8 @@ public class FingerprintMojoTest {
     assertTrue(fileContent.contains("href=\"css/style.css?0dde3d756e6a436c0b2ff85433038729\""));
     assertTrue(fileContent.contains("href=\"css/style.css?0dde3d756e6a436c0b2ff85433038729&param=value\""));
     assertTrue(fileContent.contains("href=\"css/style.css?0dde3d756e6a436c0b2ff85433038729#tag\""));
+    assertTrue(fileContent.contains("href=\"css/doesntexist.css\""));
+    assertTrue(fileContent.contains("src=\"//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js\""));
     assertTrue(fileContent.contains("src=\"/js/script.js?f5039e9ac47dd3f0fbac0d6944e16561\""));
     assertTrue(fileContent.contains("src=\"./images/image.png?b0330d7d0b6ea9faccc7b93686e18230\""));
   }
@@ -218,6 +339,8 @@ public class FingerprintMojoTest {
     assertTrue(fileContent.contains("href=\"../css/style.css?0dde3d756e6a436c0b2ff85433038729\""));
     assertTrue(fileContent.contains("href=\"../css/style.css?0dde3d756e6a436c0b2ff85433038729&param=value\""));
     assertTrue(fileContent.contains("href=\"../css/style.css?0dde3d756e6a436c0b2ff85433038729#tag\""));
+    assertTrue(fileContent.contains("href=\"../css/doesntexist.css\""));
+    assertTrue(fileContent.contains("src=\"//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js\""));
     assertTrue(fileContent.contains("src=\"../js/script.js?f5039e9ac47dd3f0fbac0d6944e16561\""));
     assertTrue(
         fileContent.contains("src=\"../images/image.png?b0330d7d0b6ea9faccc7b93686e18230\""));
@@ -235,6 +358,8 @@ public class FingerprintMojoTest {
     assertFalse(fileContent.contains("href=\"../css/style.css?0dde3d756e6a436c0b2ff85433038729&param=value\""));
     assertTrue(fileContent.contains("href=\"../css/style.css#tag\""));
     assertFalse(fileContent.contains("href=\"../css/style.css?0dde3d756e6a436c0b2ff85433038729#tag\""));
+    assertTrue(fileContent.contains("href=\"../css/doesntexist.css\""));
+    assertTrue(fileContent.contains("src=\"//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js\""));
     assertTrue(fileContent.contains("src=\"../js/script.js\""));
     assertFalse(fileContent.contains("src=\"../js/script.js?f5039e9ac47dd3f0fbac0d6944e16561\""));
     assertTrue(fileContent.contains("src=\"../images/image.png\""));

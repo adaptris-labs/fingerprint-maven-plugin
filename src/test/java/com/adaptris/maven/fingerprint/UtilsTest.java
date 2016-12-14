@@ -154,6 +154,20 @@ public class UtilsTest {
   }
 
   @Test
+  public void testMkDirsNoDir() throws MojoExecutionException, URISyntaxException, IOException {
+    URL resource = getClass().getResource("/utils/utilsTestFile.txt");
+    File srcDir = new File(resource.toURI());
+    File destDir = new File(srcDir.getParentFile(), "destMkdirs");
+    if (destDir.exists()) {
+      FileUtils.deleteDirectory(destDir);
+    }
+    assertFalse(destDir.exists());
+    Utils.mkDirs(srcDir, destDir, null);
+
+    assertFalse(destDir.exists());
+  }
+
+  @Test
   public void testGetFileExtentionNullFilename() {
     assertNull(Utils.getFileExtension(null));
   }
