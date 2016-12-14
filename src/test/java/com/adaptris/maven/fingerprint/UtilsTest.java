@@ -2,6 +2,7 @@ package com.adaptris.maven.fingerprint;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -41,7 +42,7 @@ public class UtilsTest {
   public void testGenerateMd5Fingerprint() throws MojoExecutionException, URISyntaxException {
     URL resource = getClass().getResource("/utils/utilsTestFile.txt");
     String m5Fingerprint = Utils.generateMd5Fingerprint(new File(resource.toURI()));
-    assertEquals("e22229eaf7a54f4489d3d52d5ec21488", m5Fingerprint);
+    assertEquals("7d6316068167e995d1bc10b0abe78071", m5Fingerprint);
   }
 
   @Test
@@ -64,7 +65,9 @@ public class UtilsTest {
   public void testReadFile() throws MojoExecutionException, URISyntaxException {
     URL resource = getClass().getResource("/utils/utilsTestFile.txt");
     String fileContent = Utils.readFile(new File(resource.toURI()));
-    assertEquals("Meaningless dummy file for Junit tests.", fileContent);
+    assertNotNull(fileContent);
+    assertTrue(fileContent.contains("Meaningless dummy file for Junit tests."));
+    assertTrue(fileContent.contains("Second Line"));
   }
 
   @Test

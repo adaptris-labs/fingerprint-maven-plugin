@@ -13,6 +13,8 @@ import org.apache.maven.plugin.logging.Log;
 public class Utils {
 
   private static final String UTF_8 = "UTF-8";
+  private static final String LINUX_EOL = "\n";
+  private static final String EOL_PATTERN = "\\r\\n?";
 
   public static String generateMd5Fingerprint(File file) throws MojoExecutionException {
     if (file == null) {
@@ -21,6 +23,8 @@ public class Utils {
     String fingerprint;
     try {
       String fileContent = FileUtils.readFileToString(file, UTF_8);
+      // Always linux format
+      fileContent = fileContent.replaceAll(EOL_PATTERN, LINUX_EOL);
       fingerprint = DigestUtils.md5Hex(fileContent);
     } catch (Exception expt) {
       throw new MojoExecutionException(

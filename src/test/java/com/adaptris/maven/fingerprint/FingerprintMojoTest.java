@@ -202,24 +202,25 @@ public class FingerprintMojoTest {
     File dummyFileForTesting = new File(outputDirectory, "dummy-file-for-testing.html");
     assertTrue("file " + dummyFileForTesting.getAbsolutePath() + " should exist", dummyFileForTesting.exists());
     String fileContent = Utils.readFile(dummyFileForTesting);
-    assertTrue(fileContent.contains("value=\"/favicon.ico?4a274f22d0754eef0654bf9448a999b3\""));
-    assertTrue(fileContent.contains("href=\"css/style.css?8dcfc23d6a370ca167a39ebe905cc423\""));
-    assertTrue(fileContent.contains("href=\"css/style.css?8dcfc23d6a370ca167a39ebe905cc423&param=value\""));
-    assertTrue(fileContent.contains("href=\"css/style.css?8dcfc23d6a370ca167a39ebe905cc423#tag\""));
-    assertTrue(fileContent.contains("src=\"/js/script.js?9994db6574d19a157f9b152ad8327ffd\""));
-    assertTrue(fileContent.contains("src=\"./images/image.png?fce3b44b7d049d5be06eabad332cc3bf\""));
+    assertTrue(fileContent.contains("value=\"/favicon.ico?1a32b9900843d1339d968f1e36cb4930\""));
+    assertTrue(fileContent.contains("href=\"css/style.css?0dde3d756e6a436c0b2ff85433038729\""));
+    assertTrue(fileContent.contains("href=\"css/style.css?0dde3d756e6a436c0b2ff85433038729&param=value\""));
+    assertTrue(fileContent.contains("href=\"css/style.css?0dde3d756e6a436c0b2ff85433038729#tag\""));
+    assertTrue(fileContent.contains("src=\"/js/script.js?f5039e9ac47dd3f0fbac0d6944e16561\""));
+    assertTrue(fileContent.contains("src=\"./images/image.png?b0330d7d0b6ea9faccc7b93686e18230\""));
   }
 
   private void assertSubDummyFile(File outputDirectory) throws MojoExecutionException {
     File dummyFileForTesting = new File(outputDirectory, "sub/dummy-file-for-testing.html");
     assertTrue(dummyFileForTesting.exists());
     String fileContent = Utils.readFile(dummyFileForTesting);
-    assertTrue(fileContent.contains("value=\"../favicon2.ico?4a274f22d0754eef0654bf9448a999b3\""));
-    assertTrue(fileContent.contains("href=\"../css/style.css?8dcfc23d6a370ca167a39ebe905cc423\""));
-    assertTrue(fileContent.contains("href=\"../css/style.css?8dcfc23d6a370ca167a39ebe905cc423&param=value\""));
-    assertTrue(fileContent.contains("href=\"../css/style.css?8dcfc23d6a370ca167a39ebe905cc423#tag\""));
-    assertTrue(fileContent.contains("src=\"../js/script.js?9994db6574d19a157f9b152ad8327ffd\""));
-    assertTrue(fileContent.contains("src=\"../images/image.png?fce3b44b7d049d5be06eabad332cc3bf\""));
+    assertTrue(fileContent.contains("value=\"../favicon2.ico?1a32b9900843d1339d968f1e36cb4930\""));
+    assertTrue(fileContent.contains("href=\"../css/style.css?0dde3d756e6a436c0b2ff85433038729\""));
+    assertTrue(fileContent.contains("href=\"../css/style.css?0dde3d756e6a436c0b2ff85433038729&param=value\""));
+    assertTrue(fileContent.contains("href=\"../css/style.css?0dde3d756e6a436c0b2ff85433038729#tag\""));
+    assertTrue(fileContent.contains("src=\"../js/script.js?f5039e9ac47dd3f0fbac0d6944e16561\""));
+    assertTrue(
+        fileContent.contains("src=\"../images/image.png?b0330d7d0b6ea9faccc7b93686e18230\""));
   }
 
   private void assertIgnoreDummyFile(File outputDirectory) throws MojoExecutionException {
@@ -227,34 +228,35 @@ public class FingerprintMojoTest {
     assertTrue(dummyFileForTesting.exists());
     String fileContent = Utils.readFile(dummyFileForTesting);
     assertTrue(fileContent.contains("value=\"../favicon2.ico\""));
-    assertFalse(fileContent.contains("value=\"../favicon2.ico?4a274f22d0754eef0654bf9448a999b3\""));
+    assertFalse(fileContent.contains("value=\"../favicon2.ico?1a32b9900843d1339d968f1e36cb4930\""));
     assertTrue(fileContent.contains("href=\"../css/style.css\""));
-    assertFalse(fileContent.contains("href=\"../css/style.css?8dcfc23d6a370ca167a39ebe905cc423\""));
+    assertFalse(fileContent.contains("href=\"../css/style.css?0dde3d756e6a436c0b2ff85433038729\""));
     assertTrue(fileContent.contains("href=\"../css/style.css?param=value\""));
-    assertFalse(fileContent.contains("href=\"../css/style.css?8dcfc23d6a370ca167a39ebe905cc423&param=value\""));
+    assertFalse(fileContent.contains("href=\"../css/style.css?0dde3d756e6a436c0b2ff85433038729&param=value\""));
     assertTrue(fileContent.contains("href=\"../css/style.css#tag\""));
-    assertFalse(fileContent.contains("href=\"../css/style.css?8dcfc23d6a370ca167a39ebe905cc423#tag\""));
+    assertFalse(fileContent.contains("href=\"../css/style.css?0dde3d756e6a436c0b2ff85433038729#tag\""));
     assertTrue(fileContent.contains("src=\"../js/script.js\""));
-    assertFalse(fileContent.contains("src=\"../js/script.js?9994db6574d19a157f9b152ad8327ffd\""));
+    assertFalse(fileContent.contains("src=\"../js/script.js?f5039e9ac47dd3f0fbac0d6944e16561\""));
     assertTrue(fileContent.contains("src=\"../images/image.png\""));
-    assertFalse(fileContent.contains("src=\"../images/image.png?fce3b44b7d049d5be06eabad332cc3bf\""));
+    assertFalse(
+        fileContent.contains("src=\"../images/image.png?b0330d7d0b6ea9faccc7b93686e18230\""));
   }
 
   private void assertCssUrl(File outputDirectory) throws MojoExecutionException {
     File cssFile = new File(outputDirectory, "css/style.css");
     assertTrue(cssFile.exists());
     String fileContent = Utils.readFile(cssFile);
-    assertTrue(fileContent.contains("url(\"../images/image.png?fce3b44b7d049d5be06eabad332cc3bf\")"));
-    assertTrue(fileContent.contains("url('../images/image.png?fce3b44b7d049d5be06eabad332cc3bf')"));
+    assertTrue(fileContent.contains("url(\"../images/image.png?b0330d7d0b6ea9faccc7b93686e18230\")"));
+    assertTrue(fileContent.contains("url('../images/image.png?b0330d7d0b6ea9faccc7b93686e18230')"));
   }
 
   private void assertJsUrl(File outputDirectory) throws MojoExecutionException {
     File cssFile = new File(outputDirectory, "js/script.js");
     assertTrue(cssFile.exists());
     String fileContent = Utils.readFile(cssFile);
-    assertTrue(fileContent.contains("fromUrl: 'component.js?1e819d866dd3d2b3a70d86d15316659a'"));
+    assertTrue(fileContent.contains("fromUrl: 'component.js?29546d842fc6e36303afb9bf1b775377'"));
     assertTrue(fileContent.contains("fromUrl: \"component.tmpl.html?cb254044d90893fa918b79d272827fae\""));
-    assertTrue(fileContent.contains("differentPatternUrl: 'component.js?1e819d866dd3d2b3a70d86d15316659a'"));
+    assertTrue(fileContent.contains("differentPatternUrl: 'component.js?29546d842fc6e36303afb9bf1b775377'"));
   }
 
   @Test
