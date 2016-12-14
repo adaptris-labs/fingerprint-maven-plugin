@@ -1,33 +1,30 @@
 package com.adaptris.maven.fingerprint;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 
 public class Utils {
 
+  private static final String UTF_8 = "UTF-8";
 
   public static String generateMd5Fingerprint(File file) throws MojoExecutionException {
     if (file == null) {
       throw new MojoExecutionException("file should not be null to generate the Md5 Fingerprint");
     }
     String fingerprint;
-    FileInputStream fis = null;
     try {
-      fis = new FileInputStream(file);
-      fingerprint = DigestUtils.md5Hex(fis);
+      String fileContent = FileUtils.readFileToString(file, UTF_8);
+      fingerprint = DigestUtils.md5Hex(fileContent);
     } catch (Exception expt) {
       throw new MojoExecutionException(
           "unable to calculate md5 for file: " + file.getAbsolutePath(), expt);
-    } finally {
-      IOUtils.closeQuietly(fis);
     }
     return fingerprint;
   }
@@ -36,14 +33,10 @@ public class Utils {
     if (file == null) {
       throw new MojoExecutionException("file should not be null to be able to read it");
     }
-    FileReader r = null;
     try {
-      r = new FileReader(file);
-      return IOUtils.toString(r);
+      return FileUtils.readFileToString(file, UTF_8);
     } catch (Exception e) {
       throw new MojoExecutionException("unable to read file: " + file.getAbsolutePath(), e);
-    } finally {
-      IOUtils.closeQuietly(r);
     }
   }
 
