@@ -1,12 +1,10 @@
 package com.adaptris.maven.fingerprint;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 
@@ -48,14 +46,10 @@ public class Utils {
     if (file == null) {
       throw new MojoExecutionException("file should not be null to be able to write in it");
     }
-    FileWriter w = null;
     try {
-      w = new FileWriter(file);
-      IOUtils.write(content, w);
+      FileUtils.writeStringToFile(file, content, UTF_8);
     } catch (IOException e) {
       throw new MojoExecutionException("unable to write in file: " + file.getAbsolutePath(), e);
-    } finally {
-      IOUtils.closeQuietly(w);
     }
   }
 
