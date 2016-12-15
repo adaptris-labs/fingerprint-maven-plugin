@@ -284,6 +284,31 @@ public class FingerprintMojoTest {
   }
 
   @Test
+  public void testEmptyInclude() throws Exception {
+    File outputDirectory = new File(OUTPUT_DIR + "_testEmptyInclude");
+    FingerprintMojo fingerprintMojo = new FingerprintMojo();
+
+    // Configure the instance
+    Class<FingerprintMojo> clazz = FingerprintMojo.class;
+
+    configureSourceDir(fingerprintMojo, clazz);
+    configureTargetDir(fingerprintMojo, clazz, outputDirectory.getAbsolutePath());
+
+    List<String> includes = new ArrayList<>();
+    Field includesField = clazz.getDeclaredField("includes");
+    includesField.setAccessible(true);
+    includesField.set(fingerprintMojo, includes);
+
+    FileUtils.deleteDirectory(outputDirectory);
+
+    fingerprintMojo.execute();
+
+    File dummyFileForTesting = new File(outputDirectory, "dummy-file-for-testing.html");
+    assertFalse("file " + dummyFileForTesting.getAbsolutePath() + " should not exist",
+        dummyFileForTesting.exists());
+  }
+
+  @Test
   public void testNoExclude() throws Exception {
     File outputDirectory = new File(OUTPUT_DIR + "_testNoExclude");
     FingerprintMojo fingerprintMojo = new FingerprintMojo();
@@ -301,6 +326,32 @@ public class FingerprintMojoTest {
 
     File dummyFileForTesting = new File(outputDirectory, "dummy-file-for-testing.html");
     assertTrue("file " + dummyFileForTesting.getAbsolutePath() + " should exist", dummyFileForTesting.exists());
+  }
+
+  @Test
+  public void testEmptyExclude() throws Exception {
+    File outputDirectory = new File(OUTPUT_DIR + "_testEmptyExclude");
+    FingerprintMojo fingerprintMojo = new FingerprintMojo();
+
+    // Configure the instance
+    Class<FingerprintMojo> clazz = FingerprintMojo.class;
+
+    configureSourceDir(fingerprintMojo, clazz);
+    configureTargetDir(fingerprintMojo, clazz, outputDirectory.getAbsolutePath());
+    configureInclude(fingerprintMojo, clazz);
+
+    List<String> excludes = new ArrayList<>();
+    Field excludesField = clazz.getDeclaredField("excludes");
+    excludesField.setAccessible(true);
+    excludesField.set(fingerprintMojo, excludes);
+
+    FileUtils.deleteDirectory(outputDirectory);
+
+    fingerprintMojo.execute();
+
+    File dummyFileForTesting = new File(outputDirectory, "dummy-file-for-testing.html");
+    assertTrue("file " + dummyFileForTesting.getAbsolutePath() + " should exist",
+        dummyFileForTesting.exists());
   }
 
   @Test

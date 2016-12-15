@@ -10,6 +10,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -154,7 +156,8 @@ public class UtilsTest {
   }
 
   @Test
-  public void testMkDirsNoDir() throws MojoExecutionException, URISyntaxException, IOException {
+  public void testMkDirsSourceNotDir()
+      throws MojoExecutionException, URISyntaxException, IOException {
     URL resource = getClass().getResource("/utils/utilsTestFile.txt");
     File srcDir = new File(resource.toURI());
     File destDir = new File(srcDir.getParentFile(), "destMkdirs");
@@ -190,6 +193,45 @@ public class UtilsTest {
   @Test
   public void testGetFileExtentionTwoExtensions() {
     assertEquals("html", Utils.getFileExtension("filename.tmpl.html"));
+  }
+
+  @Test
+  public void testFindFiles() throws URISyntaxException {
+    URL resource = getClass().getResource("/utils/srcMkdirs");
+    File srcDir = new File(resource.toURI());
+    List<String> includes = new ArrayList<>();
+    includes.add("**/subDirFile*");
+    List<String> excludes = new ArrayList<>();
+    excludes.add("**/subSubDir2/**");
+    List<File> files = Utils.findFiles(srcDir, includes, excludes);
+    assertNotNull(files);
+    assertEquals(3, files.size());
+  }
+
+  @Test
+  public void testFindFilesSourceNotDir() throws URISyntaxException {
+    URL resource = getClass().getResource("/utils/utilsTestFile.txt");
+    File srcDir = new File(resource.toURI());
+    List<String> includes = new ArrayList<>();
+    includes.add("**/subDirFile*");
+    List<String> excludes = new ArrayList<>();
+    excludes.add("**/subSubDir2/**");
+    List<File> files = Utils.findFiles(srcDir, includes, excludes);
+    assertNotNull(files);
+    assertEquals(0, files.size());
+  }
+
+  @Test
+  public void testFindFilesNoMatchingFiles() throws URISyntaxException {
+    URL resource = getClass().getResource("/utils/srcMkdirs");
+    File srcDir = new File(resource.toURI());
+    List<String> includes = new ArrayList<>();
+    includes.add("**/subDirFile*");
+    List<String> excludes = new ArrayList<>();
+    excludes.add("**/**");
+    List<File> files = Utils.findFiles(srcDir, includes, excludes);
+    assertNotNull(files);
+    assertEquals(0, files.size());
   }
 
 }

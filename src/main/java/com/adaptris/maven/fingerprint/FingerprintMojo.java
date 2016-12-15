@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,7 +20,6 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.codehaus.plexus.util.DirectoryScanner;
 
 @Mojo(name = "generate", defaultPhase = LifecyclePhase.PACKAGE)
 public class FingerprintMojo extends AbstractMojo {
@@ -124,10 +122,11 @@ public class FingerprintMojo extends AbstractMojo {
     }
     if (excludes == null || excludes.isEmpty()) {
       getLog().info("no files to exclude found");
-      excludes = Collections.emptyList();
+      if (excludes == null) {
+        excludes = Collections.emptyList();
+      }
     }
-    List<File> filesToOptimize = new ArrayList<>();
-    findFilesToOptimize(filesToOptimize, sourceDirectory);
+    List<File> filesToOptimize = findFilesToOptimize(sourceDirectory);
     if (filesToOptimize.isEmpty()) {
       getLog().info("no files to optimize were found");
       return;
@@ -306,23 +305,8 @@ public class FingerprintMojo extends AbstractMojo {
     }
   }
 
-  private void findFilesToOptimize(List<File> output, File source) {
-    if (!source.isDirectory()) {
-      return;
-    }
-
-    DirectoryScanner scanner = new DirectoryScanner();
-
-    scanner.setIncludes(includes.toArray(new String[includes.size()]));
-    scanner.setExcludes(excludes.toArray(new String[excludes.size()]));
-    scanner.addDefaultExcludes();
-    scanner.setBasedir(source);
-    scanner.scan();
-
-    for (String includedFilename : scanner.getIncludedFiles()) {
-      File curFile = new File(source, includedFilename);
-      output.add(curFile);
-    }
+  private List<File> findFilesToOptimize(File source) {
+    return Utils.findFiles(source, includes, excludes);
   }
 
   public class FilePathAndNewName {

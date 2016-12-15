@@ -2,11 +2,14 @@ package com.adaptris.maven.fingerprint;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
+import org.codehaus.plexus.util.DirectoryScanner;
 
 public class Utils {
 
@@ -85,6 +88,26 @@ public class Utils {
       }
     }
     return null;
+  }
+
+  public static List<File> findFiles(File source, List<String> includes, List<String> excludes) {
+    List<File> output = new ArrayList<>();
+    if (source.isDirectory()) {
+      DirectoryScanner scanner = new DirectoryScanner();
+
+      scanner.setIncludes(includes.toArray(new String[includes.size()]));
+      scanner.setExcludes(excludes.toArray(new String[excludes.size()]));
+      scanner.addDefaultExcludes();
+      scanner.setBasedir(source);
+      scanner.scan();
+
+      for (String includedFilename : scanner.getIncludedFiles()) {
+        File curFile = new File(source, includedFilename);
+        output.add(curFile);
+      }
+    }
+
+    return output;
   }
 
 }
