@@ -66,9 +66,6 @@ public class FingerprintMojo extends AbstractMojo {
   private List<String> excludes;
 
   @Parameter
-  private Set<String> htmlExtensions;
-
-  @Parameter
   private Set<String> patterns;
 
   /**
@@ -156,28 +153,7 @@ public class FingerprintMojo extends AbstractMojo {
     for (Pattern pattern : allPatterns) {
       outputFileData = processPattern(pattern, outputFileData.toString(), sourceFile.getAbsolutePath());
     }
-    String processedData = null;
-    if (htmlExtensions != null && !htmlExtensions.isEmpty()) {
-      String extension = Utils.getFileExtension(sourceFile.getName());
-      if (extension != null && htmlExtensions.contains(extension)) {
-        getLog().info("minifying html: " + sourceFile.getAbsolutePath());
-        processedData = HtmlMinifier.minify(outputFileData.toString());
-      }
-    } else if (sourceFile.getName().contains(".min.")) {
-      // getLog().info("ignoring already minified resource: " + sourceFile.getAbsolutePath());
-    } else if (sourceFile.getName().endsWith(".js")) {
-      // processedData = outputFileData.toString();
-      // getLog().info("minifying javascript: " + sourceFile.getAbsolutePath());
-      // processedData = Compressor.compressJavaScript(new StringReader(processedData), getLog());
-    } else if (sourceFile.getName().endsWith(".css")) {
-      // processedData = outputFileData.toString();
-      // getLog().info("minifying css: " + sourceFile.getAbsolutePath());
-      // processedData = Compressor.compressCSS(new StringReader(processedData), getLog());
-    }
-
-    if (processedData == null) {
-      processedData = outputFileData.toString();
-    }
+    String processedData = outputFileData.toString();
 
     File targetFile = new File(targetDirectory, stripSourceDirectory(sourceDirectory, sourceFile));
     Utils.writeInFile(processedData, targetFile);

@@ -65,12 +65,6 @@ Configuration
 					<sourceDirectory>${basedir}/target/webcombined</sourceDirectory>
 <!-- ${project.build.directory}/optimized-webapp by default -->
 					<targetDirectory>${basedir}/target/optimized-webapp</targetDirectory>
-<!-- Remove unnecessary spaces between tags. Make single line page. Takes into consideration <pre> tags -->
-					<htmlExtensions>
-						<htmlExtension>html</htmlExtension>
-						<htmlExtension>jsp</htmlExtension>
-						<htmlExtension>tag</htmlExtension>
-					</htmlExtensions>
 					<includes>
 						<include>**/*.html</include>
 						<include>**/*.jsp</include>
