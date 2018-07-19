@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.adaptris.maven</groupId>
     <artifactId>fingerprint-maven-plugin</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.1</version>
     <packaging>maven-plugin</packaging>
     <name>fingerprint-maven-plugin</name>
     <description>Maven Plugin which add resource fingerprint to the resource URL</description>
