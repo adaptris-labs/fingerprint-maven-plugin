@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.adaptris.maven</groupId>
     <artifactId>fingerprint-maven-plugin</artifactId>
-    <version>1.1</version>
+    <version>1.2-SNAPSHOTS</version>
     <packaging>maven-plugin</packaging>
     <name>fingerprint-maven-plugin</name>
     <description>Maven Plugin which add resource fingerprint to the resource URL</description>
@@ -17,7 +17,7 @@
     </properties>
 
     <prerequisites>
-        <maven>3.2.5</maven>
+        <maven>3.5.0</maven>
     </prerequisites>
 
     <dependencies>
@@ -39,12 +39,12 @@
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-plugin-api</artifactId>
-            <version>3.2.5</version>
+            <version>3.5.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven.plugin-tools</groupId>
             <artifactId>maven-plugin-annotations</artifactId>
-            <version>3.2</version>
+            <version>3.5</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -163,7 +163,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.7.7.201606060606</version>
+                <version>0.8.1</version>
                 <executions>
                     <execution>
                         <id>pre-unit-test</id>
@@ -208,7 +208,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.7.7.201606060606</version>
+                <version>0.8.1</version>
                 <configuration>
                     <!-- Sets the path to the file which contains the execution data. -->
                     <destFile>${jacoco.exec.path}</destFile>
