@@ -29,15 +29,15 @@ public class FingerprintMojo extends AbstractMojo {
   /*
    * Default patterns, more can be added using the patterns property
    */
-  public Pattern LINK_PATTERN = Pattern.compile("(<link.*?href=\")(.*?)(\".*?>)");
-  public Pattern SCRIPT_PATTERN = Pattern.compile("(\")([^\\s\"]*?\\.js)(\")");
-  public Pattern IMG_PATTERN = Pattern.compile("(<img.*?src=\")([^\\}\\{]*?)(\".*?>)");
-  public Pattern CSS_IMG_PATTERN = Pattern.compile("(url\\([\",'])(.*?)([\",']\\))");
-  //  public Pattern JSTL_URL_PATTERN = Pattern.compile("(<c:url.*?value=\")(/{1}.*?)(\".*?>)");
-  public Pattern JSTL_URL_PATTERN = Pattern.compile("(<c:url.*?value=\")([/{1}|\\.{1,2}].*?)(\".*?>)");
-  public Pattern FROM_URL_PATTERN = Pattern.compile("(fromUrl:\\s*[\",'])(.*?)([\",'])");
+  public static final Pattern LINK_PATTERN = Pattern.compile("(<link.*?href=\")(.*?)(\".*?>)");
+  public static final Pattern SCRIPT_PATTERN = Pattern.compile("(\")([^\\s\"]*?\\.js)(\")");
+  public static final Pattern IMG_PATTERN = Pattern.compile("(<img.*?src=\")([^\\}\\{]*?)(\".*?>)");
+  public static final Pattern CSS_IMG_PATTERN = Pattern.compile("(url\\([\",'])(.*?)([\",']\\))");
+  // public static final Pattern JSTL_URL_PATTERN = Pattern.compile("(<c:url.*?value=\")(/{1}.*?)(\".*?>)");
+  public static final Pattern JSTL_URL_PATTERN = Pattern.compile("(<c:url.*?value=\")([/{1}|\\.{1,2}].*?)(\".*?>)");
+  public static final Pattern FROM_URL_PATTERN = Pattern.compile("(fromUrl:\\s*[\",'])(.*?)([\",'])");
 
-  public Pattern DOLLAR_SIGN = Pattern.compile("\\$");
+  public static final Pattern DOLLAR_SIGN = Pattern.compile("\\$");
 
   public Set<Pattern> allPatterns = new HashSet<>();
 
@@ -269,11 +269,8 @@ public class FingerprintMojo extends AbstractMojo {
         continue;
       }
 
-      FileInputStream fis = null;
-      FileOutputStream fos = null;
-      try {
-        fis = new FileInputStream(curFile);
-        fos = new FileOutputStream(new File(dstDir, curFile.getName()));
+      try (FileInputStream fis = new FileInputStream(curFile);
+          FileOutputStream fos = new FileOutputStream(new File(dstDir, curFile.getName()));) {
         IOUtils.copy(fis, fos);
       } catch (Exception e) {
         throw new MojoExecutionException("unable to copy", e);
