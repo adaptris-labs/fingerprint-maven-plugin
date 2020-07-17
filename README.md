@@ -11,6 +11,8 @@ This plugin performs several optimizations:
   * JS/CSS minification. yuicompressor is used
   * html minification.  
   
+**Requires Java 8 +**
+  
 ### Fingerprinting
 
 During this process plugin calculates file checksum and prepends it to the file name. All links to this filename will be changed to the fingerprinted version. Original file will be deleted. Fingerprinting used to improve web resource caching. If file checksum is not changed, then the name will be the same and it is safe to add max expires header. Once file contents are changed, checksum will be changed as well. This plugin filters out (recursivly) source directory, detects any resources using the patterns below and copy result (if needed) to the target directory.
