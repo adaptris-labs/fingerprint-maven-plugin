@@ -16,3 +16,12 @@ updates:
     reviewers:
       - sebastien-belin-adp
       - higgyfella
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    allow:
+      - dependency-type: "all"
+    reviewers:
+      - sebastien-belin-adp
+      - higgyfella
