@@ -97,7 +97,7 @@ public class FingerprintMojoTest {
    */
   @Test
   public void testPattern() throws Exception {
-    Pattern linkPattern = fingerprintMojo.LINK_PATTERN;
+    Pattern linkPattern = FingerprintMojo.LINK_PATTERN;
     String linkUrl = "<link rel=\"stylesheet\" href=\"${pageContext.request.contextPath}/resources/css/style.css\" />";
     Matcher linkMatcher = linkPattern.matcher(linkUrl);
     assertTrue(linkMatcher.find());
@@ -109,7 +109,7 @@ public class FingerprintMojoTest {
     assertTrue(linkMatcher2.find());
     assertEquals("../resources/css/style.css", linkMatcher2.group(2));
 
-    Pattern scriptPattern = fingerprintMojo.SCRIPT_PATTERN;
+    Pattern scriptPattern = FingerprintMojo.SCRIPT_PATTERN;
     String scriptUrl = "<script src=\"${pageContext.request.contextPath}/resources/js/vendor/zepto.js\">";
     Matcher scriptMatcher = scriptPattern.matcher(scriptUrl);
     assertTrue(scriptMatcher.find());
@@ -123,7 +123,7 @@ public class FingerprintMojoTest {
     assertEquals("${pageContext.request.contextPath}/resources/js/vendor/zepto.js",
         scriptMatcher2.group(2));
 
-    Pattern imgPattern = fingerprintMojo.IMG_PATTERN;
+    Pattern imgPattern = FingerprintMojo.IMG_PATTERN;
     String imageUrl = "<img src=\"/images/favicon-whatever.ico\" />";
     Matcher imgMatcher = imgPattern.matcher(imageUrl);
     assertTrue(imgMatcher.find());
@@ -134,7 +134,7 @@ public class FingerprintMojoTest {
     assertFalse(imgMatcher2.find());
 
     // Tests for the CSS image references
-    Pattern cssPattern = fingerprintMojo.CSS_IMG_PATTERN;
+    Pattern cssPattern = FingerprintMojo.CSS_IMG_PATTERN;
     // Double quotes url, absolute location
     String cssUrl1 = "url(\"/images/navigation-s66728e073e.png\")";
     Matcher cssMatcher1 = cssPattern.matcher(cssUrl1);
@@ -160,7 +160,7 @@ public class FingerprintMojoTest {
     assertEquals("../images/navigation-s66728e073e.png", cssMatcher4.group(2));
 
     // JSTL url, absolute
-    Pattern jstlUrlPattern = fingerprintMojo.JSTL_URL_PATTERN;
+    Pattern jstlUrlPattern = FingerprintMojo.JSTL_URL_PATTERN;
     String jstlUrl1 = "<c:url value=\"/resources/images/favicon.ico\" var=\"faviconUrl\"/>";
     Matcher jstlUrlMatcher1 = jstlUrlPattern.matcher(jstlUrl1);
     assertTrue(jstlUrlMatcher1.find());
@@ -177,7 +177,7 @@ public class FingerprintMojoTest {
     assertFalse(jstlUrlMatcher3.find());
 
     // Tests for the fromUrl for knockout js component
-    Pattern fromUrlPattern = fingerprintMojo.FROM_URL_PATTERN;
+    Pattern fromUrlPattern = FingerprintMojo.FROM_URL_PATTERN;
     // Double quotes url, absolute location
     String fromUrl1 = "fromUrl: \"component.js\"";
     Matcher fromUrlMatcher1 = fromUrlPattern.matcher(fromUrl1);
