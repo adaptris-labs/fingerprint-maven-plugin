@@ -113,18 +113,18 @@ public class FingerprintMojo extends AbstractMojo {
     if (!targetDirectory.isDirectory()) {
       throw new MojoExecutionException("output directory is not a directory: " + targetDirectory.getAbsolutePath());
     }
-    if (includes == null || includes.isEmpty()) {
+    if (isEmpty(includes)) {
       getLog().info("no files to include found");
       return;
     }
-    if (excludes == null || excludes.isEmpty()) {
+    if (isEmpty(excludes)) {
       getLog().info("no files to exclude found");
       if (excludes == null) {
         excludes = Collections.emptyList();
       }
     }
     List<File> filesToOptimize = findFilesToOptimize(sourceDirectory);
-    if (filesToOptimize.isEmpty()) {
+    if (isEmpty(filesToOptimize)) {
       getLog().info("no files to optimize were found");
       return;
     }
@@ -280,6 +280,10 @@ public class FingerprintMojo extends AbstractMojo {
 
   private List<File> findFilesToOptimize(File source) {
     return Utils.findFiles(source, includes, excludes);
+  }
+
+  private boolean isEmpty(List<?> list) {
+    return list == null || list.isEmpty();
   }
 
   public class FilePathAndNewName {
